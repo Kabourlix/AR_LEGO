@@ -45,5 +45,6 @@ namespace Data
         public string piece;
         public int x;
         public int y;
+        public int z;
     }
 }
