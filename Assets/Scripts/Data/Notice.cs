@@ -11,6 +11,16 @@ namespace Data
     /// </summary>
     public class Notice : MonoBehaviour
     {
+        public static Notice Instance;
+
+        private void Awake()
+        {
+            if(Instance != null & Instance != this)
+                Destroy(gameObject);
+
+            Instance = this;
+        }
+
         private string _path, _jsonString;
         private DataModel _model;
 
@@ -20,7 +30,6 @@ namespace Data
             _jsonString = File.ReadAllText(_path);
             _model = JsonConvert.DeserializeObject<DataModel>(_jsonString);
         }
-        
         
     }
 
