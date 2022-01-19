@@ -33,18 +33,25 @@ namespace Data
         
     }
 
-    public class DataModel
-    {
-        public int id;
-        public string name;
-        public List<Step> steps;
-    }
-
+    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
     public class Step
     {
-        public string piece;
-        public int x;
-        public int y;
-        public int z;
+        public string piece { get; set; }
+        public string origin { get; set; }
+        public string pos { get; set; }
+        public string orientation { get; set; }
+        public string resultName { get; set; }
+        public string amount { get; set; }
     }
+
+    public class DataModel
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public string origin { get; set; }
+        public List<Step> steps { get; set; }
+    }
+
+
+
 }

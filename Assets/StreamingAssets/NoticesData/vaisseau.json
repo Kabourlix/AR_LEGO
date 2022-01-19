@@ -1,0 +1,56 @@
+{
+  "id" : "002",
+  "name" : "vaisseau",
+  "origin" : "ne",
+  "steps" : [
+    {"piece": "b:Y:2x2",
+      "origin" : "b:P:2x2",
+      "pos" : "0,1,0",
+      "orientation" : "0",
+      "resultName" : "cb:1:2x2",
+      "amount" : "2"
+    },
+    {"piece": "b:Be:8x2",
+      "origin" : "b:Be:8x2",
+      "pos" : "0,0,3",
+      "orientation" : "0",
+      "resultName" : "cb:2:8x4",
+      "amount" : "1"
+    },
+    {"piece": "cb:1:2x2",
+      "origin" : "cb:2:8x4",
+      "pos" : "0,1,1",
+      "orientation" : "0",
+      "resultName" : "cb:3:8x4",
+      "amount" : "1"
+    },
+    {"piece": "cb:1:2x2",
+      "origin" : "cb:3:8x4",
+      "pos" : "6,1,1",
+      "orientation" : "0",
+      "resultName" : "cb:4:8x4",
+      "amount" : "1"
+    },
+    {"piece": "b:Be:4x2",
+      "origin" : "b:G:2x1",
+      "pos" : "0,1,-1",
+      "orientation" : "1",
+      "resultName" : "cb:5:2x4",
+      "amount" : "2"
+    },
+    {"piece": "cb:5:2x4",
+      "origin" : "cb:4:8x4",
+      "pos" : "0,2,0",
+      "orientation" : "0",
+      "resultName" : "cb:6:8x4",
+      "amount" : "1"
+    },
+    {"piece": "cb:5:2x4",
+      "origin" : "cb:6:8x4",
+      "pos" : "6,0,0",
+      "orientation" : "2",
+      "resultName" : "final",
+      "amount" : "1"
+    }
+  ]
+}
