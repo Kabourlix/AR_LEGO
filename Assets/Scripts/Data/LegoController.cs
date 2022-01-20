@@ -6,42 +6,111 @@ using Data;
 
 public class LegoController : MonoBehaviour
 {
-    public event Action OnNoticeFinished;
-    public event Action OnActionImpossible;
+    //private static Vector3 LEGO_SIZE = new Vector3(5 * 1.6e-3f, 2 * 1.6e-3f, 5 * 1.6e-3f);
+    private static Vector3 LEGO_SIZE = Vector3.one;
 
-    [SerializeField]
-    private List<GameObject> brickPrefabs;
-    private GameObject currentBrick;
+    private Dictionary<string, GameObject> existingBricks;
+    private GameObject shownBrick;
 
-    public void PutPiece(Piece piece, bool mainArea)
+    [SerializeField] private GameObject mainAreaRoot;
+    [SerializeField] private GameObject secondAreaRoot;
+    [SerializeField] private GameObject missingBrick;
+
+    public void Start()
     {
-        /* crée le prefab "parent_brick" si inexistant.
-         * ajoute le prefab "brick" à "parent_brick".
-         */
+        existingBricks = new Dictionary<string, GameObject>();
     }
 
-
-
-
-
-
-
-
-
-
-    private void CleanCurrentStep()
+    /// <summary>
+    /// Remove the bricks and assemblies stored in memory
+    /// </summary>
+    public void Clear()
     {
-        Destroy(currentBrick);
+        foreach (KeyValuePair<string, GameObject> x in existingBricks)
+        {
+            Destroy(x.Value);
+        }
+        Destroy(shownBrick);
+        existingBricks.Clear();
     }
 
-    private void StartStep(int x, int y, int z, int orientation, string piece)
+    /// <summary>
+    /// Hide the brick on the staging areas
+    /// </summary>
+    public void HideBrick()
     {
-        Vector3 world_position = new Vector3(
-            x * 5 * 1.6e-3f, // scale to real lego dimensions
-            y * 2 * 1.6e-3f,
-            z * 5 * 1.6e-3f
-        );
-        Quaternion world_orientation = Quaternion.AngleAxis(90 * orientation, Vector3.up);
-        currentBrick = Instantiate(brickPrefabs[0], world_position, world_orientation);
+        Destroy(shownBrick);
+    }
+
+    /// <summary>
+    /// Add a brick to an assembly and show it on the main or secondary area
+    /// </summary>
+    public void PutBrick(Piece piece, bool mainArea)
+    {
+        
+
+        // Convert lego coordinates into world coordinates
+        Vector3 world_position = Vector3.Scale(piece.Pos, LEGO_SIZE);
+        Quaternion world_orientation = piece.Orientation;
+        
+        // Create a new destination if this one is new
+        if (!existingBricks.ContainsKey(piece.CompositeName))
+        {
+            GameObject newComposite = new GameObject(piece.CompositeName);
+            newComposite.name = piece.CompositeName;
+            newComposite.SetActive(false);
+            existingBricks.Add(piece.CompositeName, newComposite);
+        }
+
+        // Create a new source if this one is new
+        if (!existingBricks.ContainsKey(piece.Nom))
+        {
+            GameObject generatedBrick = GenerateBrick(piece.Nom);
+            generatedBrick.name = piece.Nom + "_generated";
+            generatedBrick.SetActive(false);
+            existingBricks.Add(piece.Nom, generatedBrick);
+        }
+
+        // Copy the source and add it to the destination
+        GameObject newBrick = Instantiate(existingBricks[piece.Nom], existingBricks[piece.CompositeName].transform);
+        newBrick.name = piece.Nom;
+        newBrick.transform.position = world_position;
+        newBrick.transform.rotation = world_orientation;
+
+        // Show the source on the staging area
+        Destroy(shownBrick);
+        GameObject root = mainArea ? mainAreaRoot : secondAreaRoot;
+        shownBrick = Instantiate(newBrick, root.transform);
+        shownBrick.name = piece.Nom + "_shown";
+        shownBrick.SetActiveRecursively(true);
+    }
+
+    private GameObject GenerateBrick(string name)
+    {
+        // TODO: générer la pièce
+        return Instantiate(missingBrick);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown("a"))
+        {
+            // ajoute brique1 à comp1
+            PutBrick(new Piece("brique1", new Vector3(0, 0, 0), Quaternion.identity, "comp1"), false);
+        }
+        if (Input.GetKeyDown("b"))
+        {
+            // ajoute brique2 à comp2
+            PutBrick(new Piece("brique2", new Vector3(1, 0, 0), Quaternion.identity, "comp1"), false);
+        }
+        if (Input.GetKeyDown("c"))
+        {
+            // ajoute comp1 à main
+            PutBrick(new Piece("comp1", new Vector3(0, 1, 0), Quaternion.identity, "main"), true);
+        }
+        if (Input.GetKeyDown("z"))
+        {
+            Clear();
+        }
     }
 }
