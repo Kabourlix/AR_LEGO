@@ -11,6 +11,7 @@ namespace Data
     /// </summary>
     public class Notice : MonoBehaviour
     {
+        #region Make the class scriptable object
         public static Notice Instance;
 
         private void Awake()
@@ -20,10 +21,13 @@ namespace Data
 
             Instance = this;
         }
-
+        #endregion
+        
         private string _path, _jsonString;
         private Root _model;
-        
+
+        private int _partIndex;
+
         /// <summary>
         /// This function is aimed at extracting the whole notice : containing each subnotices
         /// </summary>
@@ -35,14 +39,15 @@ namespace Data
             _model = JsonConvert.DeserializeObject<Root>(_jsonString);
         }
 
-        public Step GetStep(int partIndex, int stepIndex)
+        public Part GetPart()
         {
-            if (partIndex > _model.parts.Count && partIndex < 0) return null;
-            if (stepIndex > _model.parts[partIndex].steps.Count && stepIndex < 0) return null;
-            return _model.parts[partIndex].steps[stepIndex];
+            if (_partIndex > _model.parts.Count && _partIndex < 0) return null;
+            Part p = _model.parts[_partIndex];
+            _partIndex++; //We update the index for next call
+            return p;
         }
-        
-        
+
+
     }
 }
 
@@ -57,7 +62,7 @@ public class Step
 public class Part
 {
     public string id { get; set; }
-    public string main { get; set; }
+    public bool main { get; set; }
     public string result { get; set; }
     public List<Step> steps { get; set; }
 }
