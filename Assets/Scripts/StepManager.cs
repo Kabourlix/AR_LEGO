@@ -41,7 +41,8 @@ public class StepManager : MonoBehaviour
     {
         LoadMainNotice(mainNoticeName);
         noticeUI.SetActive(true); // We active the notice UI for this part.s
-        //Set the slider status
+        //TODO : Set the slider max and init it;
+        //StepUIController.SetSliderMax(_notice.GetNoticeSize())
     }
 
     private void LoadMainNotice(string noticeName)
@@ -75,7 +76,12 @@ public class StepManager : MonoBehaviour
         if (_currentStepIndex >= _currentPart.steps.Count)
         {
             print("We pass to a new part of the notice");
-            _currentPart = _notice.GetPart(); //! Pay attention to the moment there is no part anymore ! 
+            _currentPart = _notice.GetPart();  
+            if (_currentPart == null) // We reached the end of the notice
+            {
+                EndNotice();
+                return; 
+            }
             _currentStepIndex = 0;
         }
         Piece p = ConvertStepToPiece(_currentPart.steps[_currentStepIndex]);
@@ -84,11 +90,17 @@ public class StepManager : MonoBehaviour
         NewBrick(p,_currentPart.main); //We instruct a new brick is to be treated.
     }
 
+    private void EndNotice()
+    {
+        
+    }
+
+
 
     #region Events
     public event Action<Part> OnPartChanged; // Pas sur que ce soit utile
 
-    private void PartChanged(Part part)
+    private void PartChanged(Part part) // This shall update the slider status
     {
         OnPartChanged?.Invoke(part);
     }

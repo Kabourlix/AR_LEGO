@@ -47,6 +47,8 @@ namespace Data
             return p;
         }
 
+        public int GetNoticeSize() {return _model.parts.Count;}
+
 
     }
 }
