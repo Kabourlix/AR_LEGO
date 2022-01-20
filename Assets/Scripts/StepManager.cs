@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Data;
+using JetBrains.Annotations;
 
 public class StepManager : MonoBehaviour
 {
@@ -49,4 +50,22 @@ public class StepManager : MonoBehaviour
         OnStepsChanged?.Invoke(steps);
     }
 
+    public event Action<Piece, bool> OnNewBrickToBeDisplayed;
+
+}
+
+public struct Piece
+{
+    public string Nom;
+    public Vector3 Pos;
+    public Quaternion Orientation;
+    public string CompositeName;
+
+    public Piece(string nom, Vector3 pos, Quaternion orientation, string compositeName)
+    {
+        this.Nom = nom;
+        this.Pos = pos;
+        this.Orientation = orientation;
+        this.CompositeName = compositeName;
+    }
 }
