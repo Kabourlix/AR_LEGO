@@ -66,7 +66,7 @@ public class StepManager : MonoBehaviour
 
     public void LoadConstruction(string constructionName)
     {
-        _notice.Load(constructionName);
+        _currentStepIndex = _notice.Load(constructionName);
     }
     #endregion
 

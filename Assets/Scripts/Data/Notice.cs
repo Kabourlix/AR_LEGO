@@ -23,7 +23,6 @@ namespace Data
         }
         #endregion
         
-        private string _path, _jsonString;
         private Root _model;
 
         private int _partIndex;
@@ -34,11 +33,19 @@ namespace Data
         /// <param name="filename"> the name of the json file to parse</param>
         public void ExtractMainNotice(string filename)
         {
-            _path = Application.streamingAssetsPath + "/NoticesData/" + filename + ".json";
-            _jsonString = File.ReadAllText(_path);
-            _model = JsonConvert.DeserializeObject<Root>(_jsonString);
+            //_path = Application.streamingAssetsPath + "/NoticesData/" + filename + ".json";
+            //_jsonString = File.ReadAllText(_path);
+            //_model = JsonConvert.DeserializeObject<Root>(_jsonString);
+            ReadJson<Root>(filename, out _model, "/NoticesData/");
         }
 
+        private void ReadJson<T>(string filename,out T model, string subFolder = "/NoticesData/")
+        {
+            string path = Application.streamingAssetsPath + subFolder + filename + ".json";
+            string jsonString = File.ReadAllText(path);
+            model = JsonConvert.DeserializeObject<T>(jsonString);
+        }
+        
         public Part GetPart()
         {
             if (_partIndex > _model.parts.Count && _partIndex < 0) return null;
@@ -68,9 +75,12 @@ namespace Data
             print("Teh file has been written.");
         }
 
-        public void Load(string constructionName)
+        public int Load(string constructionName)
         {
-            throw new NotImplementedException();
+            ExtractMainNotice(constructionName); // Initialize the model
+            ReadJson<SaveWrite>(constructionName, out SaveWrite s, "/NoticesSave/"); // This write in s
+            _partIndex = s.CurrentPartIndex;
+            return s.CurrentStepIndex;
         }
 
         private void Start()
