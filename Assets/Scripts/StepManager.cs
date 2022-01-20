@@ -42,7 +42,7 @@ public class StepManager : MonoBehaviour
         LoadMainNotice(mainNoticeName);
         noticeUI.SetActive(true); // We active the notice UI for this part.s
         //TODO : Set the slider max and init it;
-        //StepUIController.SetSliderMax(_notice.GetNoticeSize())
+        //StepUIController.SetSliderMax(_notice.GetNoticeSize()) 
     }
 
     private void LoadMainNotice(string noticeName)
@@ -54,6 +54,23 @@ public class StepManager : MonoBehaviour
         
         NextStep();
     }
+
+    #region Saves
+    /// <summary>
+    /// This function should save the user Construction.
+    /// </summary>
+    public void SaveConstruction()
+    {
+        _notice.Save(_currentStepIndex-1); //Because if we are at step 1, then _currentStepIndex = 2.
+    }
+
+    public void LoadConstruction(string constructionName)
+    {
+        _notice.Load(constructionName);
+    }
+    #endregion
+
+    
 
     private Piece ConvertStepToPiece(Step s)
     {

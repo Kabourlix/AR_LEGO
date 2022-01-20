@@ -47,9 +47,38 @@ namespace Data
             return p;
         }
 
+        public void LoadPart(int index)
+        {
+            _partIndex = index; // we change the current part index and load the part normally.
+            GetPart();
+        }
         public int GetNoticeSize() {return _model.parts.Count;}
 
 
+        public void Save(int currentStepIndex)
+        {
+            SaveWrite s = new SaveWrite();
+            s.Name = _model.nom;
+            s.CurrentPartIndex = _partIndex - 1;
+            s.CurrentStepIndex = currentStepIndex;
+
+            string json = JsonConvert.SerializeObject(s);
+            string path = Application.streamingAssetsPath + "/NoticesSave/" + s.Name + "Save.json";
+            File.WriteAllText(path,json);
+            print("Teh file has been written.");
+        }
+
+        public void Load(string constructionName)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Start()
+        {
+            ExtractMainNotice("vaisseau"); // Create the model
+            _partIndex = 2;
+            Save(3);
+        }
     }
 }
 
@@ -74,6 +103,16 @@ public class Root
     public string nom { get; set; }
     public List<Part> parts { get; set; }
 }
+
+// This is for save json
+
+public class SaveWrite
+{
+    public string Name;
+    public int CurrentPartIndex;
+    public int CurrentStepIndex;
+}
+
 
 #endregion
 
