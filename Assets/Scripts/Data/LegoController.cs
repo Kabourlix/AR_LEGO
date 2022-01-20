@@ -6,6 +6,9 @@ using Data;
 
 public class LegoController : MonoBehaviour
 {
+    //private static Vector3 LEGO_SIZE = new Vector3(5 * 1.6e-3f, 2 * 1.6e-3f, 5 * 1.6e-3f);
+    private static Vector3 LEGO_SIZE = Vector3.one;
+
     private Dictionary<string, GameObject> existingBricks;
     private GameObject shownBrick;
 
@@ -32,12 +35,19 @@ public class LegoController : MonoBehaviour
     }
 
     /// <summary>
+    /// Hide the brick on the staging areas
+    /// </summary>
+    public void HideBrick()
+    {
+        Destroy(shownBrick);
+    }
+
+    /// <summary>
     /// Add a brick to an assembly and show it on the main or secondary area
     /// </summary>
     public void PutBrick(Piece piece, bool mainArea)
     {
-        //Vector3 LEGO_SIZE = new Vector3(5 * 1.6e-3f, 2 * 1.6e-3f, 5 * 1.6e-3f);
-        Vector3 LEGO_SIZE = Vector3.one;
+        
 
         // Convert lego coordinates into world coordinates
         Vector3 world_position = Vector3.Scale(piece.Pos, LEGO_SIZE);
@@ -73,11 +83,6 @@ public class LegoController : MonoBehaviour
         shownBrick = Instantiate(newBrick, root.transform);
         shownBrick.name = piece.Nom + "_shown";
         shownBrick.SetActiveRecursively(true);
-    }
-
-    public GameObject GetBrick(string name)
-    {
-        return existingBricks[name];
     }
 
     private GameObject GenerateBrick(string name)
