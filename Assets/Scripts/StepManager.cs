@@ -6,15 +6,16 @@ using JetBrains.Annotations;
 public class StepManager : MonoBehaviour
 {
     private Notice _notice;
-    private Step[] _currentSubSteps;
+    private Part _currentPart;
+    [SerializeField] private GameObject noticeUI;
 
-    public Step[] CurrentSubSteps
+    public Part CurrentPart
     {
-        get => _currentSubSteps;
+        get => _currentPart;
         set
         {
-            _currentSubSteps = value;
-            StepsChanged(value);
+            _currentPart = value;
+            PartChanged(value);
         }
     }
     
@@ -36,6 +37,7 @@ public class StepManager : MonoBehaviour
     public void StartNotice(string mainNoticeName)
     {
         LoadMainNotice(mainNoticeName);
+        noticeUI.SetActive(true); // We active the notice UI for this part.s
     }
 
     private void LoadMainNotice(string noticeName)
@@ -43,14 +45,18 @@ public class StepManager : MonoBehaviour
         _notice.ExtractMainNotice(noticeName);
     }
 
-    public event Action<Step[]> OnStepsChanged;
 
-    private void StepsChanged(Step[] steps)
+    #region Events
+    public event Action<Part> OnPartChanged;
+
+    private void PartChanged(Part part)
     {
-        OnStepsChanged?.Invoke(steps);
+        OnPartChanged?.Invoke(part);
     }
 
     public event Action<Piece, bool> OnNewBrickToBeDisplayed;
+    #endregion
+    
 
 }
 
