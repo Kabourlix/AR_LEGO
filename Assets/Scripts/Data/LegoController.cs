@@ -13,7 +13,7 @@ public class LegoController : MonoBehaviour
     private List<GameObject> brickPrefabs;
     private GameObject currentBrick;
 
-    public void PutBrick(int x, int y, int z, int orientation, string brick, string parent_brick)
+    public void PutPiece(Piece piece, bool mainArea)
     {
         /* crée le prefab "parent_brick" si inexistant.
          * ajoute le prefab "brick" à "parent_brick".
