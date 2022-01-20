@@ -6,42 +6,68 @@ using Data;
 
 public class LegoController : MonoBehaviour
 {
-    public event Action OnNoticeFinished;
-    public event Action OnActionImpossible;
+    private Dictionary<string, GameObject> existingBricks;
 
-    [SerializeField]
-    private List<GameObject> brickPrefabs;
-    private GameObject currentBrick;
+    [SerializeField] private GameObject mainAreaRoot;
+    [SerializeField] private GameObject secondAreaRoot;
+    [SerializeField] private GameObject missingBrick;
 
-    public void PutPiece(Piece piece, bool mainArea)
+    public void Start()
     {
-        /* crée le prefab "parent_brick" si inexistant.
-         * ajoute le prefab "brick" à "parent_brick".
-         */
+        existingBricks = new Dictionary<string, GameObject>();
     }
 
-
-
-
-
-
-
-
-
-
-    private void CleanCurrentStep()
+    public void PutBrick(Piece piece, bool mainArea)
     {
-        Destroy(currentBrick);
-    }
-
-    private void StartStep(int x, int y, int z, int orientation, string piece)
-    {
+        // Convert lego coordinates into world coordinates
         Vector3 world_position = new Vector3(
-            x * 5 * 1.6e-3f, // scale to real lego dimensions
-            y * 2 * 1.6e-3f,
-            z * 5 * 1.6e-3f
+            piece.Pos.x * 5 * 1.6e-3f,
+            piece.Pos.y * 2 * 1.6e-3f,
+            piece.Pos.z * 5 * 1.6e-3f
         );
-        Quaternion world_orientation = Quaternion.AngleAxis(90 * orientation, Vector3.up);
-        currentBrick = Instantiate(brickPrefabs[0], world_position, world_orientation);
+        Quaternion world_orientation = piece.Orientation;
+        
+        // Create a new composite if this one is new
+        if (!existingBricks.ContainsKey(piece.CompositeName))
+        {
+            GameObject newComposite = new GameObject(piece.CompositeName);
+            newComposite.name = piece.CompositeName;
+            //newComposite.SetActive(false);
+            existingBricks.Add(piece.CompositeName, newComposite);
+        }
+
+        // Create a new piece if this one is new
+        if (!existingBricks.ContainsKey(piece.Nom))
+        {
+            GameObject newBrick = GenerateBrick(piece.Nom);
+            newBrick.name = piece.Nom;
+            //newBrick.SetActive(false);
+            existingBricks.Add(piece.Nom, newBrick);
+        }
+
+        // Copy the brick and add it to the composite
+        Instantiate(existingBricks[piece.Nom], existingBricks[piece.CompositeName].transform);
+    }
+
+    private GameObject GenerateBrick(string name)
+    {
+        // TODO: générer la pièce
+        return Instantiate(missingBrick);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown("a"))
+        {
+            PutBrick(new Piece(
+                "brique1", new Vector3(0, 0, 0), Quaternion.identity, "comp1"
+            ), false);
+        }
+        if (Input.GetKeyDown("b"))
+        {
+            PutBrick(new Piece(
+                "brique2", new Vector3(1, 0, 0), Quaternion.identity, "comp1"
+            ), false);
+        }
     }
 }
