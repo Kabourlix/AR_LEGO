@@ -11,6 +11,7 @@ namespace Data
     /// </summary>
     public class Notice : MonoBehaviour
     {
+        #region Make the class scriptable object
         public static Notice Instance;
 
         private void Awake()
@@ -20,51 +21,109 @@ namespace Data
 
             Instance = this;
         }
-
-        private string _path, _jsonString;
-        private DataModel _model;
+        #endregion
         
+        private Root _model;
+
+        private int _partIndex;
+
         /// <summary>
         /// This function is aimed at extracting the whole notice : containing each subnotices
         /// </summary>
         /// <param name="filename"> the name of the json file to parse</param>
         public void ExtractMainNotice(string filename)
         {
-            _path = Application.streamingAssetsPath + "/NoticesData/" + filename + ".json";
-            _jsonString = File.ReadAllText(_path);
-            _model = JsonConvert.DeserializeObject<DataModel>(_jsonString);
+            //_path = Application.streamingAssetsPath + "/NoticesData/" + filename + ".json";
+            //_jsonString = File.ReadAllText(_path);
+            //_model = JsonConvert.DeserializeObject<Root>(_jsonString);
+            ReadJson<Root>(filename, out _model, "/NoticesData/");
         }
-        
-        /// <summary>
-        /// Extract the subnotice from a json file.
-        /// </summary>
-        /// <param name="filename"> the name of the json file.</param>
-        public void ExtractCommonNotice(string filename)
+
+        private void ReadJson<T>(string filename,out T model, string subFolder = "/NoticesData/")
         {
-            
+            string path = Application.streamingAssetsPath + subFolder + filename + ".json";
+            string jsonString = File.ReadAllText(path);
+            model = JsonConvert.DeserializeObject<T>(jsonString);
         }
         
+        public Part GetPart()
+        {
+            if (_partIndex > _model.parts.Count && _partIndex < 0) return null;
+            Part p = _model.parts[_partIndex];
+            _partIndex++; //We update the index for next call
+            return p;
+        }
+
+        public void LoadPart(int index)
+        {
+            _partIndex = index; // we change the current part index and load the part normally.
+            GetPart();
+        }
+        public int GetNoticeSize() {return _model.parts.Count;}
+
+
+        public void Save(int currentStepIndex)
+        {
+            SaveWrite s = new SaveWrite();
+            s.Name = _model.nom;
+            s.CurrentPartIndex = _partIndex - 1;
+            s.CurrentStepIndex = currentStepIndex;
+
+            string json = JsonConvert.SerializeObject(s);
+            string path = Application.streamingAssetsPath + "/NoticesSave/" + s.Name + "Save.json";
+            File.WriteAllText(path,json);
+            print("Teh file has been written.");
+        }
+
+        public int Load(string constructionName)
+        {
+            ExtractMainNotice(constructionName); // Initialize the model
+            ReadJson<SaveWrite>(constructionName, out SaveWrite s, "/NoticesSave/"); // This write in s
+            _partIndex = s.CurrentPartIndex;
+            return s.CurrentStepIndex;
+        }
+
+        private void Start()
+        {
+            ExtractMainNotice("vaisseau"); // Create the model
+            _partIndex = 2;
+            Save(3);
+        }
     }
-    
-    
-
-
-
 }
+
+#region Classes for JSON Extraction
 public class Step
 {
     public string piece { get; set; }
-    public string origin { get; set; }
     public string pos { get; set; }
-    public string orientation { get; set; }
-    public string resultName { get; set; }
-    public string amount { get; set; }
+    public string or { get; set; }
 }
 
-public class DataModel
+public class Part
 {
     public string id { get; set; }
-    public string name { get; set; }
-    public string origin { get; set; }
+    public bool main { get; set; }
+    public string result { get; set; }
     public List<Step> steps { get; set; }
 }
+
+public class Root
+{
+    public string nom { get; set; }
+    public List<Part> parts { get; set; }
+}
+
+// This is for save json
+
+public class SaveWrite
+{
+    public string Name;
+    public int CurrentPartIndex;
+    public int CurrentStepIndex;
+}
+
+
+#endregion
+
+
