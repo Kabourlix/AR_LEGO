@@ -7,11 +7,7 @@ using UnityEngine;
 public class LegoCreator : MonoBehaviour
 {
 
-    private void Start()
-    {
-        legoCreator(3, 2, 2, Color.black);
-    }
-
+    
     private float xz_gap = 0.096f;
     private float y_gap = 0.032f;
 
@@ -26,7 +22,7 @@ public class LegoCreator : MonoBehaviour
             {
                 for (int k=0; k < width; k++)
                 {
-                    Vector3 position = new Vector3(i*xz_gap,j*y_gap,k* xz_gap);
+                    Vector3 position = new Vector3(j * xz_gap,i * y_gap, k* xz_gap);
                     Quaternion rotation = new Quaternion(0, 0, 0, 0);
                     var o = Instantiate(model,position,rotation,lego.transform);
 

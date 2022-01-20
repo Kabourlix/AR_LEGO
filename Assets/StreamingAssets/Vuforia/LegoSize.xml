@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
+  <Tracking>
+    <ImageTarget name="planete" size="0.100000 0.100000" />
+    <ImageTarget name="chat" size="0.100000 0.104091" />
+    <ImageTarget name="microbe" size="0.100000 0.117874" />
+  </Tracking>
+</QCARConfig>
