@@ -18,8 +18,8 @@ public class StepManager : MonoBehaviour
             PartChanged(value);
         }
     }
-    
-    
+
+    #region Make a scriptable object + AWake function
     public static StepManager Instance;
 
     private void Awake()
@@ -33,6 +33,9 @@ public class StepManager : MonoBehaviour
         
         _notice = Notice.Instance;
     }
+
+    #endregion
+    
 
     public void StartNotice(string mainNoticeName)
     {
@@ -48,11 +51,7 @@ public class StepManager : MonoBehaviour
         _currentStepIndex = 0;
         _currentPart = _notice.GetPart();
         
-        Piece p = ConvertStepToPiece(_currentPart.steps[_currentStepIndex]);
-        _currentStepIndex++;
-        
-        NewBrick(p,_currentPart.main); //We instruct a new brick is to be treated.
-
+        NextStep();
     }
 
     private Piece ConvertStepToPiece(Step s)
@@ -67,9 +66,27 @@ public class StepManager : MonoBehaviour
         return p;
     }
 
+    /// <summary>
+    /// This function update the part of the construction if needed and provide a new brick to all the subscribed
+    /// method to the event OnNewBrickToBeDisplayed.
+    /// </summary>
+    public void NextStep()
+    {
+        if (_currentStepIndex >= _currentPart.steps.Count)
+        {
+            print("We pass to a new part of the notice");
+            _currentPart = _notice.GetPart(); //! Pay attention to the moment there is no part anymore ! 
+            _currentStepIndex = 0;
+        }
+        Piece p = ConvertStepToPiece(_currentPart.steps[_currentStepIndex]);
+        _currentStepIndex++;
+        
+        NewBrick(p,_currentPart.main); //We instruct a new brick is to be treated.
+    }
+
 
     #region Events
-    public event Action<Part> OnPartChanged;
+    public event Action<Part> OnPartChanged; // Pas sur que ce soit utile
 
     private void PartChanged(Part part)
     {
