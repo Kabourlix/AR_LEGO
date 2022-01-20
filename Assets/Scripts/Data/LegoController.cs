@@ -7,6 +7,7 @@ using Data;
 public class LegoController : MonoBehaviour
 {
     private Dictionary<string, GameObject> existingBricks;
+    private GameObject shownBrick;
 
     [SerializeField] private GameObject mainAreaRoot;
     [SerializeField] private GameObject secondAreaRoot;
@@ -17,36 +18,66 @@ public class LegoController : MonoBehaviour
         existingBricks = new Dictionary<string, GameObject>();
     }
 
+    /// <summary>
+    /// Remove the bricks and assemblies stored in memory
+    /// </summary>
+    public void Clear()
+    {
+        foreach (KeyValuePair<string, GameObject> x in existingBricks)
+        {
+            Destroy(x.Value);
+        }
+        Destroy(shownBrick);
+        existingBricks.Clear();
+    }
+
+    /// <summary>
+    /// Add a brick to an assembly and show it on the main or secondary area
+    /// </summary>
     public void PutBrick(Piece piece, bool mainArea)
     {
+        //Vector3 LEGO_SIZE = new Vector3(5 * 1.6e-3f, 2 * 1.6e-3f, 5 * 1.6e-3f);
+        Vector3 LEGO_SIZE = Vector3.one;
+
         // Convert lego coordinates into world coordinates
-        Vector3 world_position = new Vector3(
-            piece.Pos.x * 5 * 1.6e-3f,
-            piece.Pos.y * 2 * 1.6e-3f,
-            piece.Pos.z * 5 * 1.6e-3f
-        );
+        Vector3 world_position = Vector3.Scale(piece.Pos, LEGO_SIZE);
         Quaternion world_orientation = piece.Orientation;
         
-        // Create a new composite if this one is new
+        // Create a new destination if this one is new
         if (!existingBricks.ContainsKey(piece.CompositeName))
         {
             GameObject newComposite = new GameObject(piece.CompositeName);
             newComposite.name = piece.CompositeName;
-            //newComposite.SetActive(false);
+            newComposite.SetActive(false);
             existingBricks.Add(piece.CompositeName, newComposite);
         }
 
-        // Create a new piece if this one is new
+        // Create a new source if this one is new
         if (!existingBricks.ContainsKey(piece.Nom))
         {
-            GameObject newBrick = GenerateBrick(piece.Nom);
-            newBrick.name = piece.Nom;
-            //newBrick.SetActive(false);
-            existingBricks.Add(piece.Nom, newBrick);
+            GameObject generatedBrick = GenerateBrick(piece.Nom);
+            generatedBrick.name = piece.Nom + "_generated";
+            generatedBrick.SetActive(false);
+            existingBricks.Add(piece.Nom, generatedBrick);
         }
 
-        // Copy the brick and add it to the composite
-        Instantiate(existingBricks[piece.Nom], existingBricks[piece.CompositeName].transform);
+        // Copy the source and add it to the destination
+        GameObject newBrick = Instantiate(existingBricks[piece.Nom], existingBricks[piece.CompositeName].transform);
+        newBrick.name = piece.Nom;
+        newBrick.transform.position = world_position;
+        newBrick.transform.rotation = world_orientation;
+
+        // Show the source on the staging area
+        Destroy(shownBrick);
+        GameObject root = mainArea ? mainAreaRoot : secondAreaRoot;
+        shownBrick = Instantiate(newBrick, root.transform);
+        shownBrick.name = piece.Nom + "_shown";
+        shownBrick.SetActiveRecursively(true);
+    }
+
+    public GameObject GetBrick(string name)
+    {
+        return existingBricks[name];
     }
 
     private GameObject GenerateBrick(string name)
@@ -59,15 +90,22 @@ public class LegoController : MonoBehaviour
     {
         if (Input.GetKeyDown("a"))
         {
-            PutBrick(new Piece(
-                "brique1", new Vector3(0, 0, 0), Quaternion.identity, "comp1"
-            ), false);
+            // ajoute brique1 à comp1
+            PutBrick(new Piece("brique1", new Vector3(0, 0, 0), Quaternion.identity, "comp1"), false);
         }
         if (Input.GetKeyDown("b"))
         {
-            PutBrick(new Piece(
-                "brique2", new Vector3(1, 0, 0), Quaternion.identity, "comp1"
-            ), false);
+            // ajoute brique2 à comp2
+            PutBrick(new Piece("brique2", new Vector3(1, 0, 0), Quaternion.identity, "comp1"), false);
+        }
+        if (Input.GetKeyDown("c"))
+        {
+            // ajoute comp1 à main
+            PutBrick(new Piece("comp1", new Vector3(0, 1, 0), Quaternion.identity, "main"), true);
+        }
+        if (Input.GetKeyDown("z"))
+        {
+            Clear();
         }
     }
 }
