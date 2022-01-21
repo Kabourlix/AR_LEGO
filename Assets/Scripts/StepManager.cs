@@ -41,8 +41,8 @@ public class StepManager : MonoBehaviour
     {
         LoadMainNotice(mainNoticeName);
         noticeUI.SetActive(true); // We active the notice UI for this part.s
-        //TODO : Set the slider max and init it;
-        //StepUIController.SetSliderMax(_notice.GetNoticeSize()) 
+        //Set the slider max and init it;
+        noticeUI.GetComponent<NoticeUIController>().SetSliderMax(_notice.GetNoticeSize());
     }
 
     private void LoadMainNotice(string noticeName)
@@ -109,7 +109,7 @@ public class StepManager : MonoBehaviour
 
     private void EndNotice()
     {
-        
+        Application.Quit();
     }
 
 
