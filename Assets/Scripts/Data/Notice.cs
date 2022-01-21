@@ -98,6 +98,8 @@ public class Step
     public string piece { get; set; }
     public string pos { get; set; }
     public string or { get; set; }
+    
+    public string size { get; set; }
 }
 
 public class Part

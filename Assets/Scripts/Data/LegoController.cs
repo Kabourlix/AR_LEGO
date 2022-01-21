@@ -87,7 +87,7 @@ public class LegoController : MonoBehaviour
 
     private GameObject GenerateBrick(string name)
     {
-        // TODO: générer la pièce
+        // TODO: gï¿½nï¿½rer la piï¿½ce
         return Instantiate(missingBrick);
     }
 
@@ -95,18 +95,18 @@ public class LegoController : MonoBehaviour
     {
         if (Input.GetKeyDown("a"))
         {
-            // ajoute brique1 à comp1
-            PutBrick(new Piece("brique1", new Vector3(0, 0, 0), Quaternion.identity, "comp1"), false);
+            // ajoute brique1 ï¿½ comp1
+            PutBrick(new Piece("brique1", new Vector3(0, 0, 0), Quaternion.identity, "comp1","middle"), false);
         }
         if (Input.GetKeyDown("b"))
         {
-            // ajoute brique2 à comp2
-            PutBrick(new Piece("brique2", new Vector3(1, 0, 0), Quaternion.identity, "comp1"), false);
+            // ajoute brique2 ï¿½ comp2
+            PutBrick(new Piece("brique2", new Vector3(1, 0, 0), Quaternion.identity, "comp1","middle"), false);
         }
         if (Input.GetKeyDown("c"))
         {
-            // ajoute comp1 à main
-            PutBrick(new Piece("comp1", new Vector3(0, 1, 0), Quaternion.identity, "main"), true);
+            // ajoute comp1 ï¿½ main
+            PutBrick(new Piece("comp1", new Vector3(0, 1, 0), Quaternion.identity, "main","composite"), true);
         }
         if (Input.GetKeyDown("z"))
         {

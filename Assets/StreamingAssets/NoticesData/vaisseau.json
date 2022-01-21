@@ -7,9 +7,10 @@
       "result" : "main",
       "steps" : [
         {
-          "piece" : "brick",
+          "piece" : "b:blue:2:2:2",
           "pos" : "0,0,0",
-          "or" : "0,0,0"
+          "or" : "0,0,0",
+          "size" : "middle"
         }
       ]
     }

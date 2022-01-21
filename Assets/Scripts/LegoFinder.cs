@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,9 +7,11 @@ public class LegoFinder : MonoBehaviour
 {
     [SerializeField] GameObject outline;
     [SerializeField] GameObject currentlego;
-    private GameObject lego;
+    private GameObject lego; // This is the lego that need to be indicated;
     [SerializeField] Transform currenttargetimage;
     private bool targetfound;
+
+    private StepManager _stepManager;
 
     // Start is called before the first frame update
     void Start()
@@ -18,6 +21,9 @@ public class LegoFinder : MonoBehaviour
         lego = Instantiate(currentlego, currenttargetimage);
         lego.SetActive(false);
         outline.transform.rotation = new Quaternion(0, 0, 0, 0);
+        
+        _stepManager = StepManager.Instance;
+        //_stepManager.OnNewBrickToBeDisplayed += LegoIndicator();
     }
 
     // Update is called once per frame

@@ -80,7 +80,7 @@ public class StepManager : MonoBehaviour
         Vector3 pos = new Vector3(int.Parse(posStr[0]), int.Parse(posStr[1]), int.Parse(posStr[2]));
         Vector3 orEuler = new Vector3(int.Parse(orStr[0]), int.Parse(orStr[1]), int.Parse(orStr[2]));
         Quaternion or = Quaternion.Euler(orEuler);
-        Piece p = new Piece(s.piece,pos,or,_currentPart.result);
+        Piece p = new Piece(s.piece,pos,or,_currentPart.result,s.size);
         return p;
     }
 
@@ -139,12 +139,14 @@ public struct Piece
     public Vector3 Pos;
     public Quaternion Orientation;
     public string CompositeName;
+    public string Size;
 
-    public Piece(string nom, Vector3 pos, Quaternion orientation, string compositeName)
+    public Piece(string nom, Vector3 pos, Quaternion orientation, string compositeName, string size)
     {
         this.Nom = nom;
         this.Pos = pos;
         this.Orientation = orientation;
         this.CompositeName = compositeName;
+        this.Size = size;
     }
 }
