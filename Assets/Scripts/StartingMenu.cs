@@ -5,6 +5,7 @@ public class StartingMenu : MonoBehaviour
     [SerializeField] private GameObject arCam;
     [SerializeField] private GameObject scanner;
     [SerializeField] private GameObject constructionTarget;
+    [SerializeField] private GameObject confirmationCanvas;
     
     public void OnContinue()
     {
@@ -17,6 +18,7 @@ public class StartingMenu : MonoBehaviour
         Camera.main.gameObject.SetActive(false);
         arCam.SetActive(true);
         scanner.SetActive(true);
+        confirmationCanvas.SetActive(false);
         constructionTarget.SetActive(true);
         this.gameObject.SetActive(false);
     }

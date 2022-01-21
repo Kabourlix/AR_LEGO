@@ -5,10 +5,14 @@ using UnityEngine;
 public class Steps : MonoBehaviour
 {
     private StepManager step;
+    [SerializeField] GameObject confirmationPanel;
+    [SerializeField] GameObject startMenu;
+    private int maxSteps;
 
     public void Start()
     {
         step = StepManager.Instance;
+        confirmationPanel.SetActive(false);
     }
 
     public void OnNext()
@@ -23,8 +27,18 @@ public class Steps : MonoBehaviour
 
     public void OnSave()
     {
-        step.SaveConstruction();
+        confirmationPanel.SetActive(true);
     }
 
+    public void OnYes()
+    {
+        step.SaveConstruction();
+        startMenu.SetActive(true);
+        this.gameObject.SetActive(false);
+    }
 
+    public void OnNo()
+    {
+        confirmationPanel.SetActive(false);
+    }
 }
