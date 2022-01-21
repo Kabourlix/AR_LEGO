@@ -20,17 +20,18 @@ public class LegoController : MonoBehaviour
     private Dictionary<string, GameObject> existingBricks; // index of all previous bricks
     private List<GameObject> steps; // index of all steps scenes
     private LegoCreator legoCreator;
-
-    [SerializeField] private GameObject legoCreatorObject;
+    
     [SerializeField] private GameObject mainAreaRoot;
     [SerializeField] private GameObject secondAreaRoot;
-    [SerializeField] private GameObject missingBrick;
+    private StepManager _stepManager;
 
     public void Start()
     {
         existingBricks = new Dictionary<string, GameObject>();
         steps = new List<GameObject>();
-        legoCreator = legoCreatorObject.GetComponent<LegoCreator>();
+        legoCreator = gameObject.GetComponent<LegoCreator>();
+        _stepManager = StepManager.Instance;
+        _stepManager.OnNewBrickToBeDisplayed += PutBrick;
     }
 
     /// <summary>
