@@ -1,5 +1,4 @@
-using System;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Data
@@ -17,6 +16,7 @@ namespace Data
             Instance = this;
         }
         #endregion
-        
+
+        private Dictionary<string, GameObject> _legos;
     }
 }

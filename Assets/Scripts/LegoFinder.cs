@@ -2,63 +2,74 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class LegoFinder : MonoBehaviour
 {
-    [SerializeField] GameObject outline;
-    [SerializeField] GameObject currentlego;
-    private GameObject lego; // This is the lego that need to be indicated;
-    [SerializeField] Transform currenttargetimage;
-    private bool targetfound;
+    [FormerlySerializedAs("currentlego")] [SerializeField] GameObject marker;
+    [SerializeField] private Transform[] targets; //0 : small, 1 : middle, 2 : large, 3 : composite
+    private bool[] _targetsFound;
 
     private StepManager _stepManager;
 
     // Start is called before the first frame update
     void Start()
     {
-        targetfound = false;
-        outline.SetActive(false);
-        lego = Instantiate(currentlego, currenttargetimage);
-        lego.SetActive(false);
-        outline.transform.rotation = new Quaternion(0, 0, 0, 0);
-        
         _stepManager = StepManager.Instance;
-        //_stepManager.OnNewBrickToBeDisplayed += LegoIndicator();
+        _stepManager.OnNewBrickToBeDisplayed += IndicateZone;
+        _targetsFound = new[] {false, false, false, false};
+        marker.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
+    private bool once = true;
+    private void Update()
     {
-        LegoIndicator();
-    }
-
-    public void LegoIndicator()
-    {
-        if (targetfound)
+        if (once)
         {
-            // Add the lego
-            lego.transform.position = new Vector3(currenttargetimage.transform.position.x, currenttargetimage.transform.position.y + 0.5f, currenttargetimage.transform.position.z);
+            Piece p = new Piece("bebou", Vector3.one, Quaternion.identity, "bebou2", "middle");
+            IndicateZone(p,true);
+            once = false;
+        }
+        
+    }
 
-
-            //Add the outline
-            outline.transform.parent = currenttargetimage;
-            outline.transform.position = new Vector3(currenttargetimage.transform.position.x, currenttargetimage.transform.position.y - 0.001f, currenttargetimage.transform.position.z);
-
+    private void IndicateZone(Piece p, bool b)
+    {
+        switch (p.Size)
+        {
+            case "small":
+                PlaceMarker(0);
+                break;
+            case "middle":
+                PlaceMarker(1);
+                break;
+            case "large":
+                PlaceMarker(2);
+                break;
+            case "composite":
+                PlaceMarker(3);
+                break;
+            default:
+                print("The size isn't recognized !");
+                break;
         }
     }
-    public void Targetfound()
-    {
-        lego = Instantiate(currentlego, currenttargetimage);
-        lego.SetActive(true);
 
-        outline.SetActive(true);
-        targetfound = true;
+    private void PlaceMarker(int i)
+    {
+        marker.SetActive(true);
+        Vector3 targetPos = targets[i].transform.position;
+        marker.transform.position = new Vector3(targetPos.x, targetPos.y-0.01f, targetPos.z+0.02f);
     }
 
-    public void TargetLost()
+    public void TargetFound(int index)
     {
-        outline.SetActive(false);
-        lego.SetActive(false);
-        targetfound = false;
+        _targetsFound[index] = true;
     }
+
+    public void TargetLost(int index)
+    {
+        _targetsFound[index] = false;
+    }
+    
 }
