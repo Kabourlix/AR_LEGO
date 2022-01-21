@@ -6,12 +6,22 @@ using Data;
 
 public class LegoController : MonoBehaviour
 {
-    //private static Vector3 LEGO_SIZE = new Vector3(5 * 1.6e-3f, 2 * 1.6e-3f, 5 * 1.6e-3f);
-    private static Vector3 LEGO_SIZE = Vector3.one;
+    /* Units of measurement in this class:
+     *    _____
+     *  __|___|__ 
+     *  |       | ^
+     *  |       | | height of a brick = 3
+     *  |       | | height of a plate = 1
+     *  |_______| v
+     *  <------->
+     *  width of a brick = 1
+     */
 
-    private Dictionary<string, GameObject> existingBricks;
-    private GameObject shownBrick;
+    private Dictionary<string, GameObject> existingBricks; // index of all previous bricks
+    private List<GameObject> steps; // index of all steps scenes
+    private LegoCreator legoCreator;
 
+    [SerializeField] private GameObject legoCreatorObject;
     [SerializeField] private GameObject mainAreaRoot;
     [SerializeField] private GameObject secondAreaRoot;
     [SerializeField] private GameObject missingBrick;
@@ -19,6 +29,8 @@ public class LegoController : MonoBehaviour
     public void Start()
     {
         existingBricks = new Dictionary<string, GameObject>();
+        steps = new List<GameObject>();
+        legoCreator = legoCreatorObject.GetComponent<LegoCreator>();
     }
 
     /// <summary>
@@ -30,29 +42,38 @@ public class LegoController : MonoBehaviour
         {
             Destroy(x.Value);
         }
-        Destroy(shownBrick);
+        foreach (GameObject x in steps)
+        {
+            Destroy(x);
+        }
         existingBricks.Clear();
+        steps.Clear();
     }
 
     /// <summary>
-    /// Hide the brick on the staging areas
+    /// Remove the currently shown bricks
     /// </summary>
-    public void HideBrick()
+    public void HideSteps()
     {
-        Destroy(shownBrick);
+        foreach (GameObject x in steps)
+        {
+            x.SetActive(false);
+        }
     }
 
     /// <summary>
-    /// Add a brick to an assembly and show it on the main or secondary area
+    /// Show a brick that has been added previously
+    /// </summary>
+    public void ShowStep(int step)
+    {
+        steps[step].SetActiveRecursively(true);
+    }
+
+    /// <summary>
+    /// Add a brick to an assembly and show it
     /// </summary>
     public void PutBrick(Piece piece, bool mainArea)
     {
-        
-
-        // Convert lego coordinates into world coordinates
-        Vector3 world_position = Vector3.Scale(piece.Pos, LEGO_SIZE);
-        Quaternion world_orientation = piece.Orientation;
-        
         // Create a new destination if this one is new
         if (!existingBricks.ContainsKey(piece.CompositeName))
         {
@@ -74,43 +95,59 @@ public class LegoController : MonoBehaviour
         // Copy the source and add it to the destination
         GameObject newBrick = Instantiate(existingBricks[piece.Nom], existingBricks[piece.CompositeName].transform);
         newBrick.name = piece.Nom;
-        newBrick.transform.position = world_position;
-        newBrick.transform.rotation = world_orientation;
+        newBrick.transform.localPosition = piece.Pos;
+        newBrick.transform.localRotation = piece.Orientation;
+
+        GameObject stagingArea = mainArea ? mainAreaRoot : secondAreaRoot;
+        steps.Add(Instantiate(newBrick, stagingArea.transform));
 
         // Show the source on the staging area
-        Destroy(shownBrick);
-        GameObject root = mainArea ? mainAreaRoot : secondAreaRoot;
-        shownBrick = Instantiate(newBrick, root.transform);
-        shownBrick.name = piece.Nom + "_shown";
-        shownBrick.SetActiveRecursively(true);
+        HideSteps();
+        ShowStep(steps.Count - 1);
     }
 
     private GameObject GenerateBrick(string name)
     {
-        // TODO: générer la pièce
-        return Instantiate(missingBrick);
+        // Defaults
+        int length = 1;
+        int width = 1;
+        int height = 1;
+        Color color = Color.magenta;
+
+        String[] split = name.Split(':'); // brick|plate : length : width : color
+        switch (split[0])
+        {
+            case "plate":   height = 1; break;
+            case "brick":   height = 3; break;
+        }
+        int.TryParse(split[1], out length);
+        int.TryParse(split[2], out width);
+        ColorUtility.TryParseHtmlString(split[3], out color);
+
+        GameObject generated = legoCreator.legoCreator(height, length, width, color);
+        return generated;
     }
 
+    // ------------------------ TEST ------------------------
+
+    private int testStep = 0;
     void Update()
     {
-        if (Input.GetKeyDown("a"))
+        if (Input.GetKeyDown("x"))
         {
-            // ajoute brique1 à comp1
-            PutBrick(new Piece("brique1", new Vector3(0, 0, 0), Quaternion.identity, "comp1"), false);
-        }
-        if (Input.GetKeyDown("b"))
-        {
-            // ajoute brique2 à comp2
-            PutBrick(new Piece("brique2", new Vector3(1, 0, 0), Quaternion.identity, "comp1"), false);
-        }
-        if (Input.GetKeyDown("c"))
-        {
-            // ajoute comp1 à main
-            PutBrick(new Piece("comp1", new Vector3(0, 1, 0), Quaternion.identity, "main"), true);
-        }
-        if (Input.GetKeyDown("z"))
-        {
-            Clear();
+            testStep += 1;
+            switch (testStep)
+            {
+                case 1: PutBrick(new Piece("plate:12:12:gray", new Vector3(-6, 0, -6), Quaternion.identity, "main"), true); return;
+                case 2: PutBrick(new Piece("brick:4:2:red", new Vector3(0, 0, 0), Quaternion.identity, "comp1"), false); return;
+                case 3: PutBrick(new Piece("brick:4:2:green", new Vector3(0, 3, 0), Quaternion.identity, "comp1"), false); return;
+                case 4: PutBrick(new Piece("brick:4:2:red", new Vector3(0, 6, 0), Quaternion.identity, "comp1"), false); return;
+                case 5: PutBrick(new Piece("comp1", new Vector3(-6, 1, -6), Quaternion.identity, "main"), true); return;
+                case 6: PutBrick(new Piece("comp1", new Vector3(-6, 1, 6), Quaternion.Euler(0, 90, 0), "main"), true); return;
+                case 7: PutBrick(new Piece("comp1", new Vector3(6, 1, 6), Quaternion.Euler(0, 180, 0), "main"), true); return;
+                case 8: PutBrick(new Piece("comp1", new Vector3(6, 1, -6), Quaternion.Euler(0, 270, 0), "main"), true); return;
+                case 9: Clear(); testStep = 0; return;
+            }
         }
     }
 }
